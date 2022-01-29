@@ -1,1 +1,1 @@
-# -unal-intro-games-pathfinding
+# unal-intro-games-pathfinding
