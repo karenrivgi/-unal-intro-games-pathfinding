@@ -15,6 +15,7 @@ public class PathfindingAStar : MonoBehaviour
 
     public Action OnPathFoundEvent;
     public static Action OnGeneratePathEvent;
+    public static Action OnUnreachableTargetEvent;
     public float tileAnimationMaxSpeed = 0.1f;
     private float tileAnimationSpeed = 0.1f;
     
@@ -63,6 +64,13 @@ public class PathfindingAStar : MonoBehaviour
     {
         Node startNode = grid.NodeFromWorldPoint(startPos);
         Node targetNode = grid.NodeFromWorldPoint(targetPos);
+
+        if (!startNode.walkable || !targetNode.walkable)
+        {
+            OnUnreachableTargetEvent?.Invoke(); 
+            shortestPath = null;
+            yield break;
+        }
 
         List<Node> openSet = new List<Node>(); // Nodos a evaluar
         List<Node> closedSet = new List<Node>(); // Nodos que han sido evaluados
@@ -156,6 +164,7 @@ public class PathfindingAStar : MonoBehaviour
             }
         }
 
+        OnUnreachableTargetEvent?.Invoke(); 
         Debug.Log("No puedo llegar :c");
         shortestPath = null;
         yield break;
