@@ -12,6 +12,7 @@ public class GraphicNode : MonoBehaviour
     [SerializeField]
     private Animator tileAnimator;
     
+    // Modifica la escala del gameObject tileObject de acuerdo al size pasado como parametro
     public void Initialize(Node node, float size)
     {
         this.node = node;
@@ -19,6 +20,7 @@ public class GraphicNode : MonoBehaviour
         this.node.OnStateChangedEvent += OnNodeStateChange;
     }
 
+    //Cambia el spriteColor del Nodo en base a su estado actual
     private void OnNodeStateChange(NodeStates state)
     {
         switch(state)
@@ -39,12 +41,14 @@ public class GraphicNode : MonoBehaviour
                 spriteColor.color = TileColors.targetNodeColor;
                 break;
 
+            //Activa la animacion Show si el nodo no ha sido evaluado aun
             case NodeStates.Unevaluated:
                 spriteColor.color = TileColors.unEvaluatedNodeColor;
                 tileAnimator.SetBool("Hide", false);
                 tileAnimator.SetBool("Show", true);
                 break;
 
+            //Activa la animacion Hide si el nodo es un obstaculo ("pared")
              case NodeStates.Obstacle:
                 tileAnimator.SetBool("Show", false);
                 tileAnimator.SetBool("Hide", true);

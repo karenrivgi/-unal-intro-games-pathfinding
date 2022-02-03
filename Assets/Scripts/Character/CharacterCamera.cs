@@ -8,12 +8,13 @@ public class CharacterCamera : MonoBehaviour
     private Transform target;
     private Vector3 offset;
 
-    // Start is called before the first frame update
+    // Setea el offset de la camara con respecto al jugador
     void Start()
     {
         offset = transform.position - target.transform.position;
     }
 
+    // Cambiamos nuestra posicion por la del target mas la distancia al target para seguirlo
     private void LateUpdate()
     {
         if (target != null)

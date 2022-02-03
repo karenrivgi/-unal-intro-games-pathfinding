@@ -12,6 +12,7 @@ public class MazeNode
     public int gridPositionY;
 
     public bool visited = false;
+    
     public string ID
     {
         get
@@ -20,6 +21,7 @@ public class MazeNode
         }
     }
 
+    //Constructor, posicion de acuerdo a la grid generada en NodesGrid.cs
     public MazeNode (int gridPositionX, int gridPositionY)
     {
         this.gridPositionX = gridPositionX;
@@ -35,9 +37,12 @@ public class MazeNode
 
     public MazeNode MoveToNextNode()
     {
+        //Marca como visitado el nodo actual
         visited = true;
+
         List<MazeNode> unvisitedNeighbours = new List<MazeNode>();
 
+        // Revisa cuales vecinos no han sido visitados aun
         foreach (MazeNode node in neighbours)
         {
             if(node.visited == false)
@@ -46,17 +51,20 @@ public class MazeNode
             }
         }
 
+        // Si todos han sido visitados, retorna null
         if(unvisitedNeighbours.Count == 0)
         {
             return null;
         }
-
-        int randomDirection = Random.Range(0, unvisitedNeighbours.Count);
+         
+        // Si hay nodos sin visitar
+        int randomDirection = Random.Range(0, unvisitedNeighbours.Count); //Devuelve un entero entre (0,unvisitedNeighbours.Count -1)
         MazeNode neighbourSelected = unvisitedNeighbours[randomDirection];
-        DestroyWall(neighbourSelected);
+        DestroyWall(neighbourSelected); // Destruye la pared que hay entre el nodo actual y el vecino al que iremos
         return neighbourSelected;
     }
 
+    //Si el vecino no ha sido visitado, destruye la "pared" que esta entre el nodo actual y el vecino de este
     private void DestroyWall(MazeNode neighbourSelected)
     {
         if(neighbourSelected == null)
@@ -69,14 +77,15 @@ public class MazeNode
             {
                 if (activeWalls[i] == neighbourSelected.activeWalls[j])
                 {
-                    activeWalls.RemoveAt(i);
+                    //Remueve la pared de la lista de parecdes activas de ambos
+                    activeWalls.RemoveAt(i); 
                     neighbourSelected.activeWalls.RemoveAt(j);
                     return;
                 }
             }
         }
     }
-
+    
     public void ResetMazeNode()
     {
         visited = false;

@@ -18,11 +18,14 @@ public class CameraManager : MonoBehaviour
         activeCamera = topDownCamera;
     }
 
+    // Cambia entre la camara isometrica y la top down
     public void ChangeCamera()
     {
+        //Cambia el estado (activo) de las camaras de acuerdo al estado de la camara TopDown
         topDownCamera.gameObject.SetActive(!topDownCamera.gameObject.activeSelf);
         isometricCamera.gameObject.SetActive(!topDownCamera.gameObject.activeSelf);
-
+        
+        //Preguntamos si es topDownCamera la que esta activa y la guardamos en active Camera, si no, es isometricCamera
         activeCamera = topDownCamera.gameObject.activeSelf ? topDownCamera : isometricCamera;
     }
 }

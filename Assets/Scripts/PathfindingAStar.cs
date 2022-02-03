@@ -17,9 +17,12 @@ public class PathfindingAStar : MonoBehaviour
     public static Action OnGeneratePathEvent;
     public float tileAnimationMaxSpeed = 0.1f;
     private float tileAnimationSpeed = 0.1f;
-
+    
+    // Devuelve una lista de Vector3 que contiene las posiciones en el mundo de los nodos, para pasarselas
+    // al robot y que pueda recorrer el camino mas corto para llegar al target
     public List<Vector3> GetShortestPathPoints()
     {
+        //Si no se encontró un camino
         if(shortestPath == null || shortestPath.Count == 0)
         {
             return null;
@@ -40,6 +43,7 @@ public class PathfindingAStar : MonoBehaviour
             GeneratePath();
         }
     }
+    
 
     public void GeneratePath()
     {
@@ -54,38 +58,46 @@ public class PathfindingAStar : MonoBehaviour
         
     }
 
+    //Corrutina que encuentra el camino mas corto entre startPos y targetPos y muestra en juego los nodos evaluados
     private IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
     {
         Node startNode = grid.NodeFromWorldPoint(startPos);
         Node targetNode = grid.NodeFromWorldPoint(targetPos);
 
-        List<Node> openSet = new List<Node>();
-        List<Node> closedSet = new List<Node>();
+        List<Node> openSet = new List<Node>(); // Nodos a evaluar
+        List<Node> closedSet = new List<Node>(); // Nodos que han sido evaluados
+
         openSet.Add(startNode);
 
         while (openSet.Count > 0) //Mientras haya nodos para evaluar...
-        {
-            Debug.Log("whileando");
+        {  
             Node currentNode = openSet[0]; //Toma el primero de la lista a evaluar
-            for (int i = 1; i < openSet.Count; i++)
+            for (int i = 1; i < openSet.Count; i++) //loop en todos los nodos de la lista a evaluar
             {
-                Node nodeToEvaluate = openSet[i];
+                Node nodeToEvaluate = openSet[i]; 
                 if (nodeToEvaluate.FCost < currentNode.FCost || nodeToEvaluate.FCost == currentNode.FCost)
                 {
+                    //Si el nodo a evaluar tiene un Fcost mas bajo o igual que el currentNode
+                    // Comparamos su hCost, para ver siesta mas cerca del targetNode
                     if (nodeToEvaluate.hCost < currentNode.hCost)
                     {
+                        //Si ese nodo esta mas cerca, el nodo actual sera nodeToEvaluate, el nodo en el 
+                        //OpenSet con el menor Fcost
                         currentNode = nodeToEvaluate;
                     }
                 }
             }
 
-            openSet.Remove(currentNode);
+            openSet.Remove(currentNode); 
             closedSet.Add(currentNode);
-            currentNode.SetState(NodeStates.Evaluated);
+
+            currentNode.SetState(NodeStates.Evaluated); //El nodo se setea como evaluado
             yield return new WaitForSeconds(tileAnimationSpeed);
 
             if (currentNode == targetNode)
             {
+                //Si el currentNode es el targetNode, llamamos a RetracePath y cambiamos los colores de los Tiles
+                //para indicar cual es el nodo inicial, el Target, y los nodos que representan el camino mas corto al target
                 shortestPath = RetracePath(startNode, targetNode);
 
                 for (int i = 0; i < shortestPath.Count; i++)
@@ -109,20 +121,31 @@ public class PathfindingAStar : MonoBehaviour
                 yield break;
             }
 
+            //Por cada vecino del currentNode
             foreach (Node neighbour in grid.GetNeighbours(currentNode))
             {
+                //Si el vecino no es walkable o esta en el closedSet, lo pasamos
                 if (neighbour.walkable == false || closedSet.Contains(neighbour))
                 {
                     continue;
                 }
 
+                // Costo de moverse al vecino, gCost del current mas la distancia del current al vecino
                 int newCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+
+                // Si el costo de moverme al vecino es menor que su gCost, o si el vecino no esta en el openSet
                 if (newCostToNeighbour < neighbour.gCost || openSet.Contains(neighbour) == false)
                 {
+                    //gCost del vecino es el que calculamos arriba
                     neighbour.gCost = newCostToNeighbour;
+
+                    //El hCost se halla con la distancia entre el nodo y el nodo target
                     neighbour.hCost = GetDistance(neighbour, targetNode);
+
+                    //Seteamos el parent del vecino como el currentNode
                     neighbour.parent = currentNode;
 
+                    //Si el vecino no esta en el openSet, lo agregamos
                     if (openSet.Contains(neighbour) == false)
                     {
                         openSet.Add(neighbour);
@@ -136,10 +159,10 @@ public class PathfindingAStar : MonoBehaviour
         Debug.Log("No puedo llegar :c");
         shortestPath = null;
         yield break;
-
-
     }
 
+    // El path se construye de atras para adelante, acá revertimos agregando los nodos parent a una lista hasta
+    // que se llegue al startNode, ahí lo agregamos y hacemos path.reverse() 
     private List<Node> RetracePath(Node startNode, Node endNode)
     {
         List<Node> path = new List<Node>();
@@ -150,19 +173,30 @@ public class PathfindingAStar : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }
+
         path.Add(startNode);
         path.Reverse();
         grid.path = path;
+
         return path;
     }
 
+    // https://youtu.be/mZfyt03LDH4?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW&t=841
     private int GetDistance(Node nodeA, Node nodeB)
     {
+        // 14 costo de moverse en diagonal
+        // 10 costo de moverse horizontalmente
+        
+        // distancia en X de del punto A al punto B
         int dstX = Mathf.Abs(nodeA.gridPosition.x - nodeB.gridPosition.x);
+
+        // distancia en Y de del punto A al punto B
         int dstY = Mathf.Abs(nodeA.gridPosition.y - nodeB.gridPosition.y);
 
+        //Si la distancia en X es mas grande que en Y
         if (dstX > dstY)
-            return 14 * dstY + 10 * (dstX - dstY);
-        return 14 * dstX + 10 * (dstY - dstX);
+            return 14 * dstY + 10 * (dstX - dstY); //Movimiento en diagonal + (X-Y) movimiento horizontal
+
+        return 14 * dstX + 10 * (dstY - dstX); //Movimiento en diagonal + (Y-X) movimiento vertical
     }
 }
