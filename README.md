@@ -2,11 +2,15 @@
 
 Tool desarrollada en Unity como proyecto final para la materia de Introducción a la creación de videojuegos, donde se implementa y visualiza el algoritmo _A* Search_ para la búsqueda del camino más corto y el algoritmo de _recursive backtracking_ para la generación de laberintos. 
 
+![Muestra](https://github.com/karenrivgi/unal-intro-games-pathfinding/blob/main/ImagenesRepo/Maze%20%26%20Pathfinding.png)
+
 Versión Unity:
 ```sh
 2020.3.20f1
 ```
 ##### ¿Cómo usar?
+
+![Tutorial](https://github.com/karenrivgi/unal-intro-games-pathfinding/blob/main/ImagenesRepo/Tuto.png)
 
 ##### Material en el que se basó el trabajo:
 
