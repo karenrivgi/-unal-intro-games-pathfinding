@@ -165,7 +165,6 @@ public class PathfindingAStar : MonoBehaviour
         }
 
         OnUnreachableTargetEvent?.Invoke(); 
-        Debug.Log("No puedo llegar :c");
         shortestPath = null;
         yield break;
     }

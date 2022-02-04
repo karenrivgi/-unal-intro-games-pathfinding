@@ -47,7 +47,6 @@ public class CharacterMovement : MonoBehaviour
         _targetPositions = positions;
         if (_targetPositions == null)
         {
-            Debug.Log("Ya estoy aqui");
             return;
         }
 
@@ -95,7 +94,6 @@ public class CharacterMovement : MonoBehaviour
         else
         {
             //Si estoy en _targetPositions[-1], he llegado
-            Debug.Log("Llegue :D");
             _hasArrived = true;
             OnCharacterArrivedEvent?.Invoke();
         }
